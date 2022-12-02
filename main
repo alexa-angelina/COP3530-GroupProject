@@ -8,6 +8,7 @@ int main() {
    cout << "Welcome to the Food Calculator 3000" << endl;
    cout << "Calculations aboutta go crazyyy" << endl << endl;
    
+   dataReader();
    
     return 0;
 }
@@ -36,18 +37,23 @@ void dataReader() {
     string vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
     
     
-    
     ifstream inFile;
     inFile.open("ingredients.csv"); ///FIGURE OUT A WAY TO ATTACH THIS IN GITHUB///
     
+    if (inFile.is_open()) {
+         cout << "File has been opened" << endl;
+    }
+    else {
+         cout << "ERROR: FILE NOT FOUND" << endl;
+    }
+    
      while (!inFile.eof()) {
-        getline ( inFile, city, ',' );
-        getline ( inFile, country, ',' );
-        getline ( inFile, lat, ',' );
-        inFile >> lon;
-        cout << "City: " << city << endl;
-        cout << "Country: " << country << endl;
-        cout << "Lat: " << lat << endl;
-        cout << "Lon: " << lon << endl;
+        getline ( inFile, category, ',' );
+        getline ( inFile, description, ',' );
+        getline ( inFile, nutrientBankDataNumber, ',' );
+        
+        cout << "Category: " << category << endl;
+        cout << "Description: " << description << endl;
+        cout << "Data Number: " << nutrientBankDataNumber << endl;
     }
 }
