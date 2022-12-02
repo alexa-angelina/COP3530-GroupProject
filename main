@@ -1,8 +1,53 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+   cout << "Welcome to the Food Calculator 3000" << endl;
+   cout << "Calculations aboutta go crazyyy" << endl << endl;
+   
+   
     return 0;
+}
+
+void dataReader() {
+///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
+    //Big Three
+    string category, description, nutrientBankDataNumber;
+    //Randos
+    string alphaCarotene, betaCarotene;
+    //IMPORTANT
+    string carbs, cholesterol, choline, fiber;
+    //Randos
+    string luteinZeaxanthin, lycopene, niacin;
+    //Also important
+    string protein, retinol, riboflavin, selenium, sugarTotal;
+    //Rando
+    string thiamin;
+    //Good
+    string water;
+    //FATS
+    string monosatFat, polySatFat, satFat, totalLipid;
+    //MAJOR MINERALS
+    string calcium, copper, iron, magnesium, phosphorus, potassium, sodium, zinc;
+    //VITAMINS
+    string vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
+    
+    
+    
+    ifstream inFile;
+    inFile.open("ingredients.csv"); ///FIGURE OUT A WAY TO ATTACH THIS IN GITHUB///
+    
+     while (!inFile.eof()) {
+        getline ( inFile, city, ',' );
+        getline ( inFile, country, ',' );
+        getline ( inFile, lat, ',' );
+        inFile >> lon;
+        cout << "City: " << city << endl;
+        cout << "Country: " << country << endl;
+        cout << "Lat: " << lat << endl;
+        cout << "Lon: " << lon << endl;
+    }
 }
