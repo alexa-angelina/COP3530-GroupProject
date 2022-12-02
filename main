@@ -15,7 +15,7 @@ int main() {
 
 void dataReader() {
 ///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
-///// NOTE: The data in the CSV file ends at AL - this means we have 38 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
+///// NOTE: The data in the CSV file ends at AL - this means we have 39 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
     //Big Three
     string category, description, nutrientBankDataNumber;
     //Randos
