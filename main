@@ -1,21 +1,23 @@
-#include <iostream>
+include <iostream>
+#include <SFML/Graphics.hpp>
 #include <fstream>
 #include <string>
-
 using namespace std;
 
-int main() {
-   cout << "Welcome to the Food Calculator 3000" << endl;
-   cout << "Calculations aboutta go crazyyy" << endl << endl;
-   
-   dataReader();
-   
-    return 0;
-}
+/* Current idea: store foods as objects in a vector, each nutrient is variable of object
+ When user selects a nutrient and food, sort vector by closeness to that foods value, so
+ If you selected chicken and protein it would go thru the vector and do
+ Absolute value[(chickens protein)-(current foods protein)] and sort to ascending order of that number,
+ so 0 would be closest to chicken protein val
+ also needs to ask user what sort they'd like to use cos thats kinda the point lol
+
+ sorts we CANT do: binary, linear, bubble, insertion, selection, heap
+ sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
+ */
 
 void dataReader() {
-///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
-///// NOTE: The data in the CSV file ends at AL - this means we have 38 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
+    ///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
+    ///// NOTE: The data in the CSV file ends at AL - this means we have 38 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
     //Big Three
     string category, description, nutrientBankDataNumber;
     //Randos
@@ -36,25 +38,57 @@ void dataReader() {
     string calcium, copper, iron, magnesium, phosphorus, potassium, sodium, zinc;
     //VITAMINS
     string vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
-    
-    
+
     ifstream inFile;
     inFile.open("ingredients.csv"); ///FIGURE OUT A WAY TO ATTACH THIS IN GITHUB///
-    
+
     if (inFile.is_open()) {
-         cout << "File has been opened" << endl;
+        cout << "File has been opened" << endl;
     }
     else {
-         cout << "ERROR: FILE NOT FOUND" << endl;
+        cout << "ERROR: FILE NOT FOUND" << endl;
     }
-    
-     while (!inFile.eof()) {
+
+    while (!inFile.eof()) {
         getline ( inFile, category, ',' );
         getline ( inFile, description, ',' );
         getline ( inFile, nutrientBankDataNumber, ',' );
-        
+
         cout << "Category: " << category << endl;
         cout << "Description: " << description << endl;
         cout << "Data Number: " << nutrientBankDataNumber << endl;
     }
+}
+
+int main() {
+    cout << "Welcome to the Food Calculator 3000" << endl;
+    cout << "Calculations aboutta go crazyyy" << endl << endl;
+
+    dataReader();
+
+    /*this is generic sfml starter code just so its here, i think we would also be required
+    to explain how to set sfml up w your ide in readme, idk if i can just say Make sure sfml is
+     working with your ide
+    */
+    sf::RenderWindow window(sf::VideoMode(840, 680), "Food Nutrition");
+    sf::CircleShape shape;
+    shape.setRadius(40.f);
+    shape.setPosition(100.f, 100.f);
+    shape.setFillColor(sf::Color(255,201,252));
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        window.clear(sf::Color::White);
+        window.draw(shape);
+        window.display();
+    }
+    return 0;
 }
