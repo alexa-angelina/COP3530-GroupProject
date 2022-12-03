@@ -2,19 +2,19 @@
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <string>
+#include <utility>
 #include <unordered_map>
 using namespace std;
 
 /* Current idea: store foods as objects in a vector, each nutrient is variable of object
  Unordered map storing <food name, index in vector> so its faster to find the food object we're looking for
- 
+
  When user selects a nutrient and food, sort vector by closeness to that foods value, so
  If you selected chicken and protein it would go thru the vector and do
  Absolute value[(chickens protein)-(current foods protein)] and sort to ascending order of that number,
  so 0 would be closest to chicken protein val
  also needs to ask user what sort they'd like to use cos thats kinda the point lol
 
- 
  sorts we CANT do: binary, linear, bubble, insertion, selection, heap
  sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
  */
@@ -71,10 +71,21 @@ void dataReader() {
     }
 }
 
+void quickHelper(vector<pair<string, double>> temp, int up, int down){
+
+
+}
+//i'm working on the sorting stuff, committing this so everyone sees its there
+void quickSort(vector<pair<string, double>> temp){
+    //in main, after food and nutrient are taken in from user interaction, a vector will be created that
+    //just stores pairs of the food name and the difference of its specific nutrient value form the main food
+    quickHelper(temp, 1, temp.size()-1);
+}
+
 int main() {
     cout << "Welcome to the Food Calculator 3000" << endl;
     cout << "Calculations aboutta go crazyyy" << endl << endl;
-    
+
     vector<foodItem> foods;
     //stores each foods index in vector
     unordered_map<string, int> vectorLocation;
