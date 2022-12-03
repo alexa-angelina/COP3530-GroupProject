@@ -1,23 +1,34 @@
-include <iostream>
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include <fstream>
 #include <string>
+#include <unordered_map>
 using namespace std;
 
 /* Current idea: store foods as objects in a vector, each nutrient is variable of object
+ Unordered map storing <food name, index in vector> so its faster to find the food object we're looking for
+ 
  When user selects a nutrient and food, sort vector by closeness to that foods value, so
  If you selected chicken and protein it would go thru the vector and do
  Absolute value[(chickens protein)-(current foods protein)] and sort to ascending order of that number,
  so 0 would be closest to chicken protein val
  also needs to ask user what sort they'd like to use cos thats kinda the point lol
 
+ 
  sorts we CANT do: binary, linear, bubble, insertion, selection, heap
  sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
  */
 
+struct foodItem {
+    string foodName;
+
+};
+
 void dataReader() {
     ///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
     ///// NOTE: The data in the CSV file ends at AL - this means we have 38 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
+    //34 total nutrients, so if we keep all of them we can cut # of foods down to ~2942 and still get 100k values
+    //maybe eliminate a bunch of the repeat/super similar foods?
     //Big Three
     string category, description, nutrientBankDataNumber;
     //Randos
@@ -63,7 +74,10 @@ void dataReader() {
 int main() {
     cout << "Welcome to the Food Calculator 3000" << endl;
     cout << "Calculations aboutta go crazyyy" << endl << endl;
-
+    
+    vector<foodItem> foods;
+    //stores each foods index in vector
+    unordered_map<string, int> vectorLocation;
     dataReader();
 
     /*this is generic sfml starter code just so its here, i think we would also be required
