@@ -70,22 +70,67 @@ void dataReader() {
         cout << "Data Number: " << nutrientBankDataNumber << endl;
     }
 }
-
-void quickHelper(vector<pair<string, double>> temp, int up, int down){
-
-
+//Modified ver of 6-Sorting Slide 122
+void quickHelper(vector<pair<string, double>> &temp, int lowerIndex, int upperIndex){
+    cout<<"in quick helper up is "<<lowerIndex<<"down is"<<upperIndex<<endl;
+    //takes care of size 1 edge case
+    bool swapped = false;
+    int up = lowerIndex+1;
+    int down = upperIndex;
+    if (up < down){
+        int pivotIndex = up-1;
+        while(up < down){
+            //if they can be swapped
+            if(get<1>(temp[up])>get<1>(temp[pivotIndex])&&get<1>(temp[down])<=get<1>(temp[pivotIndex])){
+                swap(temp[up],temp[down]);
+                swapped=true;
+                up++;
+                down--;
+            }
+            //up is greater, but so is down
+            else if(get<1>(temp[up])>get<1>(temp[pivotIndex])&&get<1>(temp[down])>get<1>(temp[pivotIndex])){
+                down--;
+            }
+            //down is <=, but so is up
+            else if(get<1>(temp[up])<=get<1>(temp[pivotIndex])&&get<1>(temp[down])<=get<1>(temp[pivotIndex])){
+                up++;
+                swapped = true;
+            }
+            //no swapping, both must move though
+            else{
+                up++;
+                down--;
+            }
+        }
+        if(swapped){
+            swap(temp[pivotIndex],temp[down]);
+            pivotIndex = down;
+            quickHelper(temp, lowerIndex, pivotIndex-1);
+            quickHelper(temp, pivotIndex+1, upperIndex);
+        }
+        else{
+            quickHelper(temp, lowerIndex, lowerIndex);
+            quickHelper(temp, pivotIndex+1, upperIndex);
+        }
+    }
 }
-//i'm working on the sorting stuff, committing this so everyone sees its there
-void quickSort(vector<pair<string, double>> temp){
-    //in main, after food and nutrient are taken in from user interaction, a vector will be created that
-    //just stores pairs of the food name and the difference of its specific nutrient value form the main food
-    quickHelper(temp, 1, temp.size()-1);
+/*issue when pivot is lowest in array Nvm its fixed (at least for the test case i
+was using WOOOOOOOO
+ */
+void quickSort(vector<pair<string, double>> &temp){
+    quickHelper(temp, 0, temp.size()-1);
 }
 
 int main() {
     cout << "Welcome to the Food Calculator 3000" << endl;
     cout << "Calculations aboutta go crazyyy" << endl << endl;
 
+    vector<pair<string,double>> testing {make_pair("i",7),make_pair("i",4),make_pair("i",9),
+                                      make_pair("i",3),make_pair("i",2),make_pair("i",8),make_pair("i",6),make_pair("i",5)};
+    quickSort(testing);
+    for(auto member : testing){
+        cout<< get<1>(member) << endl;
+    }
     vector<foodItem> foods;
     //stores each foods index in vector
     unordered_map<string, int> vectorLocation;
