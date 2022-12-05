@@ -17,6 +17,7 @@ using namespace std;
 
  sorts we CANT do: binary, linear, bubble, insertion, selection, heap
  sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
+ i did pivot and shell 
  */
 
 struct foodItem {
@@ -70,16 +71,35 @@ void dataReader() {
         cout << "Data Number: " << nutrientBankDataNumber << endl;
     }
 }
+
+//Using (2^k)-1 as gaps, with largest gap being ~half the vector size (Hibbard's gaps)
+//worst sort ever took me a billion years to figure out omg
+//quicksort we freaking love u.... so much simpler
+void shellSort(vector<pair<string, double>> &temp){
+    int k = (int)log2((temp.size()/2)+1);
+    int gap = pow(2,k)-1;
+    while(gap>0){
+        for ( int i = gap ; i < temp.size() ; i++){
+            pair<string,double> minIndex = temp[i];
+            int m = 0;
+            for (m = i ; m >= gap && (get<1>(temp[m-gap]) > get<1>(minIndex)) ; m=m-gap){
+                temp[m] = temp[m - gap];
+            }
+            temp[m] = minIndex;
+        }
+        k--;
+        gap = pow(2,k)-1;
+    }
+}
 //Modified ver of 6-Sorting Slide 122
-void quickHelper(vector<pair<string, double>> &temp, int lowerIndex, int upperIndex){
-    cout<<"in quick helper up is "<<lowerIndex<<"down is"<<upperIndex<<endl;
+void quickHelper(vector<pair<string, double>> temp, int lowerIndex, int upperIndex){
     //takes care of size 1 edge case
     bool swapped = false;
     int up = lowerIndex+1;
     int down = upperIndex;
     if (up < down){
         int pivotIndex = up-1;
-        while(up < down){
+        while(up <= down){
             //if they can be swapped
             if(get<1>(temp[up])>get<1>(temp[pivotIndex])&&get<1>(temp[down])<=get<1>(temp[pivotIndex])){
                 swap(temp[up],temp[down]);
@@ -114,8 +134,7 @@ void quickHelper(vector<pair<string, double>> &temp, int lowerIndex, int upperIn
         }
     }
 }
-/*issue when pivot is lowest in array Nvm its fixed (at least for the test case i
-was using WOOOOOOOO
+/*this finally works im pretty sure, will do more tests to be 100% certain
  */
 void quickSort(vector<pair<string, double>> &temp){
     quickHelper(temp, 0, temp.size()-1);
@@ -125,16 +144,16 @@ int main() {
     cout << "Welcome to the Food Calculator 3000" << endl;
     cout << "Calculations aboutta go crazyyy" << endl << endl;
 
-    vector<pair<string,double>> testing {make_pair("i",7),make_pair("i",4),make_pair("i",9),
-                                      make_pair("i",3),make_pair("i",2),make_pair("i",8),make_pair("i",6),make_pair("i",5)};
-    quickSort(testing);
+    vector<pair<string,double>> testing {make_pair("i",3),make_pair("i",4),make_pair("i",8),
+                                         make_pair("i",7),make_pair("i",6),make_pair("i",2),make_pair("i",5)};
+    shellSort(testing);
     for(auto member : testing){
         cout<< get<1>(member) << endl;
     }
     vector<foodItem> foods;
     //stores each foods index in vector
     unordered_map<string, int> vectorLocation;
-    dataReader();
+    //dataReader();
 
     /*this is generic sfml starter code just so its here, i think we would also be required
     to explain how to set sfml up w your ide in readme, idk if i can just say Make sure sfml is
@@ -146,7 +165,7 @@ int main() {
     shape.setPosition(100.f, 100.f);
     shape.setFillColor(sf::Color(255,201,252));
 
-    while (window.isOpen())
+    //while (window.isOpen())
     {
         sf::Event event;
 
