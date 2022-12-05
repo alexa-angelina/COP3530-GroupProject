@@ -17,7 +17,6 @@ using namespace std;
 
  sorts we CANT do: binary, linear, bubble, insertion, selection, heap
  sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
- i did pivot and shell 
  */
 
 struct foodItem {
@@ -147,9 +146,7 @@ int main() {
     vector<pair<string,double>> testing {make_pair("i",3),make_pair("i",4),make_pair("i",8),
                                          make_pair("i",7),make_pair("i",6),make_pair("i",2),make_pair("i",5)};
     shellSort(testing);
-    for(auto member : testing){
-        cout<< get<1>(member) << endl;
-    }
+
     vector<foodItem> foods;
     //stores each foods index in vector
     unordered_map<string, int> vectorLocation;
@@ -159,13 +156,46 @@ int main() {
     to explain how to set sfml up w your ide in readme, idk if i can just say Make sure sfml is
      working with your ide
     */
-    sf::RenderWindow window(sf::VideoMode(840, 680), "Food Nutrition");
-    sf::CircleShape shape;
-    shape.setRadius(40.f);
-    shape.setPosition(100.f, 100.f);
-    shape.setFillColor(sf::Color(255,201,252));
+    sf::RenderWindow window(sf::VideoMode(1600, 1200), "Food Nutrition");
+    //left menu bar
+    sf::RectangleShape leftBar(sf::Vector2f(400, 1200));
+    leftBar.setPosition(0, 0);
+    leftBar.setFillColor(sf::Color(230,230,230));
 
-    //while (window.isOpen())
+    sf::Font arial;
+    arial.loadFromFile("30431287674.ttf");
+
+    //quicksort button
+    sf::CircleShape quickLeft(50);
+    sf::CircleShape quickRight(50);
+    sf::RectangleShape quickMiddle(sf::Vector2f(190, 100));
+    quickMiddle.setPosition(100, 1000);
+    quickMiddle.setFillColor(sf::Color(255,156,175));
+    quickLeft.setPosition(50,1000);
+    quickRight.setPosition(240,1000);
+    quickLeft.setFillColor(sf::Color(255,156,175));
+    quickRight.setFillColor(sf::Color(255,156,175));
+    sf::Text quickSortText("Quick Sort",arial,45);
+    quickSortText.setPosition(90,1020);
+    quickSortText.setColor(sf::Color(50,50,50));
+    quickSortText.setStyle(sf::Text::Bold);
+
+    //shellsort button
+    sf::CircleShape shellLeft(50);
+    sf::CircleShape shellRight(50);
+    sf::RectangleShape shellMiddle(sf::Vector2f(190, 100));
+    shellMiddle.setPosition(100, 800);
+    shellMiddle.setFillColor(sf::Color(255,156,175));
+    shellLeft.setPosition(50,800);
+    shellRight.setPosition(240,800);
+    shellLeft.setFillColor(sf::Color(255,156,175));
+    shellRight.setFillColor(sf::Color(255,156,175));
+    sf::Text shellSortText("Shell Sort",arial,45);
+    shellSortText.setPosition(100,820);
+    shellSortText.setColor(sf::Color(50,50,50));
+    shellSortText.setStyle(sf::Text::Bold);
+
+    while (window.isOpen())
     {
         sf::Event event;
 
@@ -176,7 +206,15 @@ int main() {
         }
 
         window.clear(sf::Color::White);
-        window.draw(shape);
+        window.draw(leftBar);
+        window.draw(quickLeft);
+        window.draw(quickRight);
+        window.draw(quickMiddle);
+        window.draw(shellLeft);
+        window.draw(shellRight);
+        window.draw(shellMiddle);
+        window.draw(quickSortText);
+        window.draw(shellSortText);
         window.display();
     }
     return 0;
