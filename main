@@ -3,78 +3,138 @@
 #include <fstream>
 #include <string>
 #include <utility>
+#include <vector>
 #include <unordered_map>
 using namespace std;
 
-/* Current idea: store foods as objects in a vector, each nutrient is variable of object
- Unordered map storing <food name, index in vector> so its faster to find the food object we're looking for
-
- When user selects a nutrient and food, sort vector by closeness to that foods value, so
- If you selected chicken and protein it would go thru the vector and do
- Absolute value[(chickens protein)-(current foods protein)] and sort to ascending order of that number,
- so 0 would be closest to chicken protein val
- also needs to ask user what sort they'd like to use cos thats kinda the point lol
-
- sorts we CANT do: binary, linear, bubble, insertion, selection, heap
- sorts to pick from: pivot, shell, radix, tim, a bunch others but these don't look too bad
- */
-
 struct foodItem {
-    string foodName;
+    string category, foodName;
+    int nutrientBankDataNumber;
+    double alphaCarotene, betaCarotene, betaCryptoxanthin;  // potential throwaway?
+    double carbs, cholesterol, choline, fiber, protein, retinol, riboflavin, sugarTotal, thiamin, water, monoSatFat, polySatFat, satFat, totalLipid;
+    double calcium, copper, iron, magnesium, phosphorus, potassium, sodium, zinc, vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
+    double selenium, luteinZeaxanthin, lycopene, niacin; // potential throwaway?
 
+    foodItem(string category, string foodName, int nutrientBankDataNumber, double AC, double BC, double BCX, double carbs, double choles, double choline,
+             double fiber, double protein, double retinol, double ribo, double sugar, double thiamin, double water,
+             double mono, double poly, double satFat, double lipids, double calcium, double copper, double iron, double magnesium, double phosphorus,
+             double potassium, double sodium, double zinc, double A_RAE, double B12, double B6, double C, double E, double K,
+             double selenium, double luteZeax, double lycopene, double niacin);
 };
 
-void dataReader() {
-    ///// VARIABLE DECLARATIONS (This can be streamlined later, I just wanted to list out everything that the file contains) /////
-    ///// NOTE: The data in the CSV file ends at AL - this means we have 38 different pieces of data. We should probably determine what's actually useful for users, and toss the rest /////
-    //34 total nutrients, so if we keep all of them we can cut # of foods down to ~2942 and still get 100k values
-    //maybe eliminate a bunch of the repeat/super similar foods?
+foodItem::foodItem(string category, string foodName, int nutrientBankDataNumber, double AC, double BC, double BCX, double carbs,
+                   double choles, double choline, double fiber, double protein, double retinol, double ribo,
+                   double sugar, double thiamin, double water, double mono, double poly, double satFat, double lipids,
+                   double calcium, double copper, double iron, double magnesium, double phosphorus, double potassium,
+                   double sodium, double zinc, double A_RAE, double B12, double B6, double C, double E, double K,
+                   double selenium, double luteZeax, double lycopene, double niacin) {
+    this->category = category;
+    this->foodName = foodName;
+    this->nutrientBankDataNumber = nutrientBankDataNumber;
+    alphaCarotene = AC;
+    betaCarotene = BC;
+    betaCryptoxanthin = BCX;
+    this->carbs = carbs;
+    cholesterol = choles;
+    this->choline = choline;
+    this->fiber = fiber;
+    this->protein = protein;
+    this->retinol = retinol;
+    riboflavin = ribo;
+    sugarTotal = sugar;
+    this->thiamin = thiamin;
+    this->water = water;
+    monoSatFat = mono;
+    polySatFat = poly;
+    this->satFat = satFat;
+    totalLipid = lipids;
+    this->calcium = calcium;
+    this->copper = copper;
+    this->iron = iron;
+    this->magnesium = magnesium;
+    this->phosphorus = phosphorus;
+    this->potassium = potassium;
+    this->sodium = sodium;
+    this->zinc = zinc;
+    vitaminA_RAE = A_RAE;
+    vitaminB12 = B12;
+    vitaminB6 = B6;
+    vitaminC = C;
+    vitaminE = E;
+    vitaminK = K;
+    this->selenium = selenium;
+    luteinZeaxanthin = luteZeax;
+    this->lycopene = lycopene;
+    this->niacin = niacin;
+}
+
+void dataReader(vector<foodItem> &listOfFood, unordered_map<string,int> &foodIndex) {
+    int counter = 0;
     //Big Three
-    string category, description, nutrientBankDataNumber;
-    //Randos
-    string alphaCarotene, betaCarotene;
-    //IMPORTANT
-    string carbs, cholesterol, choline, fiber;
-    //Randos
-    string luteinZeaxanthin, lycopene, niacin;
-    //Also important
-    string protein, retinol, riboflavin, selenium, sugarTotal;
-    //Rando
-    string thiamin;
-    //Good
-    string water;
-    //FATS
-    string monosatFat, polySatFat, satFat, totalLipid;
-    //MAJOR MINERALS
-    string calcium, copper, iron, magnesium, phosphorus, potassium, sodium, zinc;
-    //VITAMINS
-    string vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
+    string category, description, nutrientBankDataNumber,alphaCarotene, betaCarotene, betaCryptoxanthin,
+    carbs, cholesterol, choline, fiber, luteinZeaxanthin, lycopene, niacin, protein, retinol, riboflavin, selenium, sugarTotal,
+    thiamin, water, monoSatFat, polySatFat, satFat, totalLipid, calcium, copper, iron, magnesium, phosphorus, potassium,
+    sodium, zinc, vitaminA_RAE, vitaminB12, vitaminB6, vitaminC, vitaminE, vitaminK;
 
     ifstream inFile;
-    inFile.open("ingredients.csv"); ///FIGURE OUT A WAY TO ATTACH THIS IN GITHUB///
-
-    if (inFile.is_open()) {
-        cout << "File has been opened" << endl;
-    }
-    else {
-        cout << "ERROR: FILE NOT FOUND" << endl;
-    }
+    inFile.open("food.csv");
 
     while (!inFile.eof()) {
         getline ( inFile, category, ',' );
         getline ( inFile, description, ',' );
         getline ( inFile, nutrientBankDataNumber, ',' );
+        getline ( inFile, alphaCarotene, ',' );
+        getline ( inFile, betaCarotene, ',' );
+        getline (inFile, betaCryptoxanthin, ',');
+        getline ( inFile, carbs, ',' );
+        getline ( inFile, cholesterol, ',' );
+        getline ( inFile, choline, ',' );
+        getline ( inFile, fiber, ',' );
+        getline ( inFile, luteinZeaxanthin, ',' );
+        getline ( inFile, lycopene, ',' );
+        getline ( inFile, niacin, ',' );
+        getline ( inFile, protein, ',' );
+        getline ( inFile, retinol, ',' );
+        getline ( inFile, riboflavin, ',' );
+        getline ( inFile, selenium, ',' );
+        getline ( inFile, sugarTotal, ',' );
+        getline ( inFile, thiamin, ',' );
+        getline ( inFile, water, ',' );
+        getline ( inFile, monoSatFat, ',' );
+        getline ( inFile, polySatFat, ',' );
+        getline ( inFile, satFat, ',' );
+        getline ( inFile, totalLipid, ',' );
+        getline ( inFile, calcium, ',' );
+        getline ( inFile, copper, ',' );
+        getline ( inFile, iron, ',' );
+        getline ( inFile, magnesium, ',' );
+        getline ( inFile, phosphorus, ',' );
+        getline ( inFile, potassium, ',' );
+        getline ( inFile, sodium, ',' );
+        getline ( inFile, zinc, ',' );
+        getline ( inFile, vitaminA_RAE, ',' );
+        getline ( inFile, vitaminB12, ',' );
+        getline ( inFile, vitaminB6, ',' );
+        getline ( inFile, vitaminC, ',' );
+        getline ( inFile, vitaminE, ',' );
+        getline ( inFile, vitaminK);
 
-        cout << "Category: " << category << endl;
-        cout << "Description: " << description << endl;
-        cout << "Data Number: " << nutrientBankDataNumber << endl;
+        if (counter == 0) {
+            counter++;
+            continue;
+        } else {
+            foodItem tempfoodItem(category, description, stoi(nutrientBankDataNumber), stod(alphaCarotene), stod(betaCarotene), stod(betaCryptoxanthin), stod(carbs), stod(cholesterol), stod(choline),
+                              stod(fiber), stod(protein), stod(retinol), stod(riboflavin), stod(sugarTotal), stod(thiamin), stod(water),
+                              stod(monoSatFat), stod(polySatFat), stod(satFat), stod(totalLipid), stod(calcium), stod(copper), stod(iron), stod(magnesium), stod(phosphorus),
+                              stod(potassium), stod(sodium), stod(zinc), stod(vitaminA_RAE), stod(vitaminB12), stod(vitaminB6), stod(vitaminC), stod(vitaminE), stod(vitaminK), stod(selenium), stod(luteinZeaxanthin), stod(lycopene), stod(niacin));
+            listOfFood.push_back(tempfoodItem);
+            foodIndex[description]=counter-1;
+            counter++;
+        }
     }
 }
 
-//Using (2^k)-1 as gaps, with largest gap being ~half the vector size (Hibbard's gaps)
-//This gap size gives us O(n^(3/2))
-//worst sort ever took me a billion years to figure out omg
-//quicksort we freaking love u.... so much simpler
+//Based on shell sort pseudocode on slide 74 of 6-Sorting lecture slides, used Hibbard's sequence as gaps
 void shellSort(vector<pair<string, double>> &temp){
     int k = (int)log2((temp.size()/2)+1);
     int gap = pow(2,k)-1;
@@ -91,9 +151,9 @@ void shellSort(vector<pair<string, double>> &temp){
         gap = pow(2,k)-1;
     }
 }
-//Modified ver of 6-Sorting Slide 122
-void quickHelper(vector<pair<string, double>> temp, int lowerIndex, int upperIndex){
-    //takes care of size 1 edge case
+
+//Based on quick sort pseudocode on slide 113 of 6-Sorting lecture slides
+void quickHelper(vector<pair<string, double>> &temp, int lowerIndex, int upperIndex){
     bool swapped = false;
     int up = lowerIndex+1;
     int down = upperIndex;
@@ -134,94 +194,503 @@ void quickHelper(vector<pair<string, double>> temp, int lowerIndex, int upperInd
         }
     }
 }
-/*this finally works im pretty sure, will do more tests to be 100% certain
- */
+
 void quickSort(vector<pair<string, double>> &temp){
     quickHelper(temp, 0, temp.size()-1);
 }
 
+void createReducedVector(vector<foodItem> foods, vector<pair<string,double>> &reduced, unordered_map<string,int> foodIndexes, string food, string nutrient){
+    if(nutrient=="alpha carotene"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].alphaCarotene-member.alphaCarotene)));
+            }
+        }
+    }
+    else if(nutrient=="beta carotene"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].betaCarotene-member.betaCarotene)));
+            }
+        }
+    }
+    else if(nutrient=="beta cryptoxanthin"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].betaCryptoxanthin-member.betaCryptoxanthin)));
+            }
+        }
+    }
+    else if(nutrient=="carbohydrate"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].carbs-member.carbs)));
+            }
+        }
+    }
+    else if(nutrient=="cholesterol"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].cholesterol-member.cholesterol)));
+            }
+        }
+    }
+    else if(nutrient=="choline"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].choline-member.choline)));
+            }
+        }
+    }
+    else if(nutrient=="fiber"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].fiber-member.fiber)));
+            }
+        }
+    }
+    else if(nutrient=="lutein/zeaxanthin"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].luteinZeaxanthin-member.luteinZeaxanthin)));
+            }
+        }
+    }
+    else if(nutrient=="lycopene"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].lycopene-member.lycopene)));
+            }
+        }
+    }
+    else if(nutrient=="niacin"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].niacin-member.niacin)));
+            }
+        }
+    }
+    else if(nutrient=="protein"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].protein-member.protein)));
+            }
+        }
+    }
+    else if(nutrient=="retinol"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].retinol-member.retinol)));
+            }
+        }
+    }
+    else if(nutrient=="riboflavin"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].riboflavin-member.riboflavin)));
+            }
+        }
+    }
+    else if(nutrient=="selenium"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].selenium-member.selenium)));
+            }
+        }
+    }
+    else if(nutrient=="sugar"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].sugarTotal-member.sugarTotal)));
+            }
+        }
+    }
+    else if(nutrient=="thiamin"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].thiamin-member.thiamin)));
+            }
+        }
+    }
+    else if(nutrient=="water"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].water-member.water)));
+            }
+        }
+    }
+    else if(nutrient=="monosaturated fat"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].monoSatFat-member.monoSatFat)));
+            }
+        }
+    }
+    else if(nutrient=="polysaturated fat"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].polySatFat-member.polySatFat)));
+            }
+        }
+    }
+    else if(nutrient=="saturated fat"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].satFat-member.satFat)));
+            }
+        }
+    }
+    else if(nutrient=="lipids"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].totalLipid-member.totalLipid)));
+            }
+        }
+    }
+    else if(nutrient=="calcium"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].calcium-member.calcium)));
+            }
+        }
+    }
+    else if(nutrient=="copper"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].copper-member.copper)));
+            }
+        }
+    }
+    else if(nutrient=="iron"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].iron-member.iron)));
+            }
+        }
+    }
+    else if(nutrient=="magnesium"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].magnesium-member.magnesium)));
+            }
+        }
+    }
+    else if(nutrient=="phosphorus"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].phosphorus-member.phosphorus)));
+            }
+        }
+    }
+    else if(nutrient=="potassium"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].potassium-member.potassium)));
+            }
+        }
+    }
+    else if(nutrient=="sodium"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].sodium-member.sodium)));
+            }
+        }
+    }
+    else if(nutrient=="zinc"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].zinc-member.zinc)));
+            }
+        }
+    }
+    else if(nutrient=="vitamin A"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminA_RAE-member.vitaminA_RAE)));
+            }
+        }
+    }
+    else if(nutrient=="vitamin B12"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminB12-member.vitaminB12)));
+            }
+        }
+    }
+    else if(nutrient=="vitamin B6"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminB6-member.vitaminB6)));
+            }
+        }
+    }
+    else if(nutrient=="vitamin C"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminC-member.vitaminC)));
+            }
+        }
+    }
+    else if(nutrient=="vitamin E"){
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminE-member.vitaminE)));
+            }
+        }
+    }
+    else{
+        for(auto member : foods){
+            if(member.foodName!=food){
+                reduced.push_back(make_pair(member.foodName,fabs(foods[foodIndexes[food]].vitaminK-member.vitaminK)));
+            }
+        }
+    }
+}
+
 int main() {
-    cout << "Welcome to the Food Calculator 3000" << endl;
-    cout << "Calculations aboutta go crazyyy" << endl << endl;
-
-    vector<pair<string,double>> testing {make_pair("i",3),make_pair("i",4),make_pair("i",8),
-                                         make_pair("i",7),make_pair("i",6),make_pair("i",2),make_pair("i",5)};
-    shellSort(testing);
-
-    vector<foodItem> foods;
-    //stores each foods index in vector
+    //create main vector, reads in data
+    vector<foodItem> vectorOfFoods;
+    unordered_map<string, int> foodIndexes;
+    dataReader(vectorOfFoods, foodIndexes);
+    vector<string> nutrients {"alpha carotene","beta carotene","beta cryptoxanthin","carbohydrate","cholesterol",
+                              "choline","fiber","lutein/zeaxanthin","lycopene","niacin","protein","retinol",
+                              "riboflavin","selenium","sugar","thiamin","water","monosaturated fat","polysaturated fat",
+                              "saturated fat","lipids","calcium","copper","iron","magnesium","phosphorus","potassium",
+                              "sodium","zinc","vitamin A","vitamin B12","vitamin B6","vitamin C","vitamin E","vitamin K"};
     unordered_map<string, int> vectorLocation;
-    //dataReader();
+    vector<pair<string,double>> reducedVector;
 
-    /*this is generic sfml starter code just so its here, i think we would also be required
-    to explain how to set sfml up w your ide in readme, idk if i can just say Make sure sfml is
-     working with your ide
-    */
     sf::RenderWindow window(sf::VideoMode(1600, 1200), "Food Nutrition");
+
+    //loading in fonts
+    sf::Font arial;
+    sf::Font arialRounded;
+    arialRounded.loadFromFile("Arial Rounded Bold.ttf");
+    arial.loadFromFile("30431287674.ttf");
+
+    // Colors
+    sf::Color gray(50,50,50);
+    sf::Color lightGray(230,230,230);
+    sf::Color darkestGray(30,30,30);
+
+    //Welcome text/instructions
+    sf::Text welcome("Welcome to the Nutrition Calculator!",arial, 74);
+    welcome.setPosition(410,120);
+    welcome.setColor(sf::Color(50,50,50));
+    welcome.setStyle(sf::Text::Bold);
+    bool welcomeScreen = true;
+    sf::Text instructionsOne("To begin, select a food and nutrient you would like to",arial, 50);
+    instructionsOne.setPosition(440,280);
+    instructionsOne.setColor(sf::Color(50,50,50));
+    sf::Text instructionsTwo("look up using the search bars. Once selected, choose",arial, 50);
+    instructionsTwo.setPosition(420,380);
+    instructionsTwo.setColor(sf::Color(50,50,50));
+    sf::Text instructionsThree("either Shell or Quick sort to retrieve the results.",arial, 50);
+    instructionsThree.setPosition(490,480);
+    instructionsThree.setColor(sf::Color(50,50,50));
+    sf::Text instructionsFour("The top 10 foods with nutrient values closest to the",arial, 50);
+    instructionsFour.setPosition(450,640);
+    instructionsFour.setColor(sf::Color(50,50,50));
+    sf::Text instructionsFive("one you selected will be shown ranked.",arial, 50);
+    instructionsFive.setPosition(560,740);
+    instructionsFive.setColor(sf::Color(50,50,50));
+    sf::Text instructionsSix("You can either select a different sort or pick a",arial, 50);
+    instructionsSix.setPosition(500,870);
+    instructionsSix.setColor(sf::Color(50,50,50));
+    sf::Text instructionsSeven("different food or nutrient to view results for.",arial, 50);
+    instructionsSeven.setPosition(530,970);
+    instructionsSeven.setColor(sf::Color(50,50,50));
+
     //left menu bar
     sf::RectangleShape leftBar(sf::Vector2f(400, 1200));
     leftBar.setPosition(0, 0);
     leftBar.setFillColor(sf::Color(230,230,230));
-
-    sf::Font arial;
-    arial.loadFromFile("30431287674.ttf");
+    sf::Text menuText("Main Menu",arialRounded,70);
+    menuText.setStyle(sf::Text::Bold);
+    menuText.setPosition(13,20);
+    menuText.setColor(sf::Color(50,50,50));
 
     //quicksort button
     sf::CircleShape quickLeft(50);
     sf::CircleShape quickRight(50);
     sf::RectangleShape quickMiddle(sf::Vector2f(190, 100));
-    quickMiddle.setPosition(100, 1000);
-    quickMiddle.setFillColor(sf::Color(255,156,175));
-    quickLeft.setPosition(50,1000);
-    quickRight.setPosition(240,1000);
-    quickLeft.setFillColor(sf::Color(255,156,175));
-    quickRight.setFillColor(sf::Color(255,156,175));
-    sf::Text quickSortText("Quick Sort",arial,45);
-    quickSortText.setPosition(90,1020);
+    quickMiddle.setPosition(100, 1050);
+    quickMiddle.setFillColor(sf::Color(179, 246, 255));
+    quickLeft.setPosition(50,1050);
+    quickRight.setPosition(240,1050);
+    quickLeft.setFillColor(sf::Color(179, 246, 255));
+    quickRight.setFillColor(sf::Color(179, 246, 255));
+    sf::Text quickSortText("Quick Sort",arialRounded,45);
+    quickSortText.setPosition(75,1070);
     quickSortText.setColor(sf::Color(50,50,50));
-    quickSortText.setStyle(sf::Text::Bold);
 
     //shellsort button
     sf::CircleShape shellLeft(50);
     sf::CircleShape shellRight(50);
     sf::RectangleShape shellMiddle(sf::Vector2f(190, 100));
-    shellMiddle.setPosition(100, 800);
-    shellMiddle.setFillColor(sf::Color(255,156,175));
-    shellLeft.setPosition(50,800);
-    shellRight.setPosition(240,800);
-    shellLeft.setFillColor(sf::Color(255,156,175));
-    shellRight.setFillColor(sf::Color(255,156,175));
-    sf::Text shellSortText("Shell Sort",arial,45);
-    shellSortText.setPosition(100,820);
+    shellMiddle.setPosition(100, 925);
+    shellMiddle.setFillColor(sf::Color(201, 173, 255));
+    shellLeft.setPosition(50,925);
+    shellRight.setPosition(240,925);
+    shellLeft.setFillColor(sf::Color(201, 173, 255));
+    shellRight.setFillColor(sf::Color(201, 173, 255));
+    sf::Text shellSortText("Shell Sort",arialRounded,45);
+    shellSortText.setPosition(85,945);
     shellSortText.setColor(sf::Color(50,50,50));
-    shellSortText.setStyle(sf::Text::Bold);
 
     //food name user input bar
     string foodSearchInput;
     bool foodSearchClicked = false;
-    sf::RectangleShape foodSearch(sf::Vector2f(300, 50));
-    foodSearch.setPosition(50,300);
+    sf::RectangleShape foodSearch(sf::Vector2f(340, 50));
+    sf::Text foodSearchHeader("Food Search",arialRounded,30);
+    foodSearchHeader.setPosition(110,110);
+    foodSearchHeader.setColor(sf::Color(30,30,30));
+    foodSearch.setPosition(30,150);
     foodSearch.setFillColor(sf::Color(255,255,255));
     foodSearch.setOutlineColor(sf::Color(50,50,50));
     foodSearch.setOutlineThickness(3);
     sf::Text foodSearchText(foodSearchInput,arial,35);
-    foodSearchText.setPosition(60,300);
+    foodSearchText.setPosition(40,150);
     foodSearchText.setColor(sf::Color(30,30,30));
+    sf::RectangleShape foodSRRect(sf::Vector2f(0, 0));
+    foodSRRect.setPosition(30,205);
+    foodSRRect.setFillColor(sf::Color(255,255,255));
+    sf::Text foodSROne("",arial,35);
+    foodSROne.setPosition(40,210);
+    foodSROne.setColor(sf::Color(30,30,30));
+    sf::Text foodSRTwo("",arial,35);
+    foodSRTwo.setPosition(40,260);
+    foodSRTwo.setColor(sf::Color(30,30,30));
+    sf::Text foodSRThree("",arial,35);
+    foodSRThree.setPosition(40,310);
+    foodSRThree.setColor(sf::Color(30,30,30));
+    sf::Text foodSRFour("",arial,35);
+    foodSRFour.setPosition(40,360);
+    foodSRFour.setColor(sf::Color(30,30,30));
+    sf::Text foodSRFive("",arial,35);
+    foodSRFive.setPosition(40,410);
+    foodSRFive.setColor(sf::Color(30,30,30));
+    vector<string> foodSearchResults;
 
     //nutrient name user input bar
     bool nutrientSearchClicked = false;
     string nutrientSearchInput;
-    sf::RectangleShape nutrientSearch(sf::Vector2f(300, 50));
-    nutrientSearch.setPosition(50,500);
+    sf::RectangleShape nutrientSearch(sf::Vector2f(340, 50));
+    sf::Text nutrientSearchHeader("Nutrient Search",arialRounded,30);
+    nutrientSearchHeader.setPosition(80,510);
+    nutrientSearchHeader.setColor(sf::Color(30,30,30));
+    nutrientSearch.setPosition(30,550);
     nutrientSearch.setFillColor(sf::Color(255,255,255));
     nutrientSearch.setOutlineColor(sf::Color(50,50,50));
     nutrientSearch.setOutlineThickness(3);
     sf::Text nutrientSearchText(nutrientSearchInput,arial,35);
-    nutrientSearchText.setPosition(60,500);
+    nutrientSearchText.setPosition(40,550);
     nutrientSearchText.setColor(sf::Color(30,30,30));
+    sf::RectangleShape nutrientSRRect(sf::Vector2f(0, 0));
+    nutrientSRRect.setPosition(30,605);
+    nutrientSRRect.setFillColor(sf::Color(255,255,255));
+    sf::Text nutrientSROne("",arial,35);
+    nutrientSROne.setPosition(40,610);
+    nutrientSROne.setColor(sf::Color(30,30,30));
+    sf::Text nutrientSRTwo("",arial,35);
+    nutrientSRTwo.setPosition(40,660);
+    nutrientSRTwo.setColor(sf::Color(30,30,30));
+    sf::Text nutrientSRThree("",arial,35);
+    nutrientSRThree.setPosition(40,710);
+    nutrientSRThree.setColor(sf::Color(30,30,30));
+    sf::Text nutrientSRFour("",arial,35);
+    nutrientSRFour.setPosition(40,760);
+    nutrientSRFour.setColor(sf::Color(30,30,30));
+    sf::Text nutrientSRFive("",arial,35);
+    nutrientSRFive.setPosition(40,810);
+    nutrientSRFive.setColor(sf::Color(30,30,30));
+    vector<string> nutrientSearchResults;
 
     double x = 0;
     double y =0;
+
+    // RESULTS SCREEN TEXT CREATION
+    sf::Text resultsLineOne("The top 10 foods most similar to :", arial, 70);
+    resultsLineOne.setPosition(500, 30);
+    resultsLineOne.setFillColor(gray);
+
+    sf::Text userFood(foodSearchInput, arial, 70);
+    userFood.setString(foodSearchInput);
+    userFood.setFillColor(sf::Color(0,0,0));
+    userFood.setStyle(sf::Text::Bold);
+
+    sf::Text userNutrient(nutrientSearchInput, arial, 70);
+    userNutrient.setString(nutrientSearchInput);
+    userNutrient.setFillColor(sf::Color(0,0,0));
+    userNutrient.setStyle(sf::Text::Bold);
+
+    sf::Text resultsLineTwo("when comparing only:", arial, 70);
+    resultsLineTwo.setPosition(620, 180);
+    resultsLineTwo.setFillColor(gray);
+
+    sf::Text numberOne("1.", arial, 55);
+    numberOne.setPosition(650, 350);
+    numberOne.setFillColor(gray);
+    sf::Text numberTwo("2.", arial, 55);
+    numberTwo.setPosition(650, 430);
+    numberTwo.setFillColor(gray);
+    sf::Text numberThree("3.", arial, 55);
+    numberThree.setPosition(650, 510);
+    numberThree.setFillColor(gray);
+    sf::Text numberFour("4.", arial, 55);
+    numberFour.setPosition(650, 590);
+    numberFour.setFillColor(gray);
+    sf::Text numberFive("5.", arial, 55);
+    numberFive.setPosition(650, 670);
+    numberFive.setFillColor(gray);
+    sf::Text numberSix("6.", arial, 55);
+    numberSix.setPosition(650, 750);
+    numberSix.setFillColor(gray);
+    sf::Text numberSeven("7.", arial, 55);
+    numberSeven.setPosition(650, 830);
+    numberSeven.setFillColor(gray);
+    sf::Text numberEight("8.", arial, 55);
+    numberEight.setPosition(650, 910);
+    numberEight.setFillColor(gray);
+    sf::Text numberNine("9.", arial, 55);
+    numberNine.setPosition(650, 990);
+    numberNine.setFillColor(gray);
+    sf::Text numberTen("10.", arial, 55);
+    numberTen.setPosition(610, 1070);
+    numberTen.setFillColor(gray);
+
+    sf::Text foodCROne("",arial,55);
+    foodCROne.setFillColor(gray);
+    foodCROne.setPosition(800, 350);
+    sf::Text foodCRTwo("",arial,55);
+    foodCRTwo.setFillColor(gray);
+    foodCRTwo.setPosition(800, 430);
+    sf::Text foodCRThree("",arial,55);
+    foodCRThree.setFillColor(gray);
+    foodCRThree.setPosition(800, 510);
+    sf::Text foodCRFour("",arial,55);
+    foodCRFour.setFillColor(gray);
+    foodCRFour.setPosition(800, 590);
+    sf::Text foodCRFive("",arial,55);
+    foodCRFive.setFillColor(gray);
+    foodCRFive.setPosition(800, 670);
+    sf::Text foodCRSix("",arial,55);
+    foodCRSix.setFillColor(gray);
+    foodCRSix.setPosition(800, 750);
+    sf::Text foodCRSeven("",arial,55);
+    foodCRSeven.setFillColor(gray);
+    foodCRSeven.setPosition(800, 830);
+    sf::Text foodCREight("",arial,55);
+    foodCREight.setFillColor(gray);
+    foodCREight.setPosition(800, 910);
+    sf::Text foodCRNine("",arial,55);
+    foodCRNine.setFillColor(gray);
+    foodCRNine.setPosition(800, 990);
+    foodCROne.setFillColor(gray);
+    sf::Text foodCRTen("",arial,55);
+    foodCRTen.setFillColor(gray);
+    foodCRTen.setPosition(800, 1070);
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -231,27 +700,174 @@ int main() {
             if(event.type == sf::Event::MouseButtonPressed){
                 x=sf::Mouse::getPosition(window).x;
                 y=sf::Mouse::getPosition(window).y;
-                if((x>=50 && x<=350) && (y>=300 && y<=350)){
+
+                //food search clicked
+                if((x>=30 && x<=370) && (y>=150 && y<=200)){
                     foodSearchClicked=true;
                     nutrientSearchClicked=false;
                 }
 
-                if((x>=50 && x<=350) && (y>=500 && y<=550)){
+                if(foodSearchClicked && (x>=30 && x<=350) && (y>200&&y<461)){
+                    if(y>=210 && y<=260){
+                        foodSearchInput=foodSearchResults[0];
+                    }
+                    else if(y>=260 && y<=310){
+                        foodSearchInput=foodSearchResults[1];
+                    }
+                    else if(y>=310 && y<=360){
+                        foodSearchInput=foodSearchResults[2];
+                    }
+                    else if(y>=360 && y<=410){
+                        foodSearchInput=foodSearchResults[3];
+                    }
+                    else if(y>=410 && y<=460){
+                        foodSearchInput=foodSearchResults[4];
+                    }
+
+                    foodSearchText.setString(foodSearchInput);
+                    foodSROne.setString("");
+                    foodSRTwo.setString("");
+                    foodSRThree.setString("");
+                    foodSRFour.setString("");
+                    foodSRFive.setString("");
+                    foodSearchClicked=false;
+                    foodSRRect.setSize(sf::Vector2f(0,0));
+                }
+
+                //nutrient search clicked
+                if((x>=30 && x<=350) && (y>=550 && y<=600)){
                     foodSearchClicked=false;
                     nutrientSearchClicked=true;
+                }
+
+                if(nutrientSearchClicked && (x>=30 && x<=350) && (y>600&&y<961)){
+                    if(y>=610 && y<=660){
+                        nutrientSearchInput=nutrientSearchResults[0];
+                    }
+                    else if(y>=660 && y<=710){
+                        nutrientSearchInput=nutrientSearchResults[1];
+                    }
+                    else if(y>=710 && y<=760){
+                        nutrientSearchInput=nutrientSearchResults[2];
+                    }
+                    else if(y>=760 && y<=810){
+                        nutrientSearchInput=nutrientSearchResults[3];
+                    }
+                    else if(y>=810 && y<=860){
+                        nutrientSearchInput=nutrientSearchResults[4];
+                    }
+
+                    nutrientSearchText.setString(nutrientSearchInput);
+                    nutrientSROne.setString("");
+                    nutrientSRTwo.setString("");
+                    nutrientSRThree.setString("");
+                    nutrientSRFour.setString("");
+                    nutrientSRFive.setString("");
+                    nutrientSearchClicked=false;
+                    nutrientSRRect.setSize(sf::Vector2f(0,0));
+                }
+
+                //shell sort clicked
+                if((x>=100 && x<=290) && (y>=925 && y<=1025) && !foodSearchClicked && !nutrientSearchClicked){
+                    welcomeScreen=false;
+                    reducedVector.clear();
+                    createReducedVector(vectorOfFoods, reducedVector, foodIndexes, foodSearchInput, nutrientSearchInput);
+                    shellSort(reducedVector);
+                    userFood.setString(foodSearchInput);
+                    userNutrient.setString(nutrientSearchInput);
+                    userFood.setPosition(1000-18*foodSearchInput.size(), 110);
+                    userNutrient.setPosition(1000-18*nutrientSearchInput.size(), 260);
+                    foodCROne.setString(get<0>(reducedVector[0]));
+                    foodCRTwo.setString(get<0>(reducedVector[1]));
+                    foodCRThree.setString(get<0>(reducedVector[2]));
+                    foodCRFour.setString(get<0>(reducedVector[3]));
+                    foodCRFive.setString(get<0>(reducedVector[4]));
+                    foodCRSix.setString(get<0>(reducedVector[5]));
+                    foodCRSeven.setString(get<0>(reducedVector[6]));
+                    foodCREight.setString(get<0>(reducedVector[7]));
+                    foodCRNine.setString(get<0>(reducedVector[8]));
+                    foodCRTen.setString(get<0>(reducedVector[9]));
+                }
+
+                //quick sort clicked
+                if((x>=100 && x<=290) && (y>=1050 && y<=1150) && !foodSearchClicked && !nutrientSearchClicked){
+                    welcomeScreen=false;
+                    reducedVector.clear();
+                    createReducedVector(vectorOfFoods, reducedVector, foodIndexes, foodSearchInput, nutrientSearchInput);
+                    quickSort(reducedVector);
+                    userFood.setString(foodSearchInput);
+                    userNutrient.setString(nutrientSearchInput);
+                    userFood.setPosition(1000-18*foodSearchInput.size(), 110);
+                    userNutrient.setPosition(1000-18*nutrientSearchInput.size(), 260);
+                    foodCROne.setString(get<0>(reducedVector[0]));
+                    foodCRTwo.setString(get<0>(reducedVector[1]));
+                    foodCRThree.setString(get<0>(reducedVector[2]));
+                    foodCRFour.setString(get<0>(reducedVector[3]));
+                    foodCRFive.setString(get<0>(reducedVector[4]));
+                    foodCRSix.setString(get<0>(reducedVector[5]));
+                    foodCRSeven.setString(get<0>(reducedVector[6]));
+                    foodCREight.setString(get<0>(reducedVector[7]));
+                    foodCRNine.setString(get<0>(reducedVector[8]));
+                    foodCRTen.setString(get<0>(reducedVector[9]));
                 }
             }
 
             if (event.type == sf::Event::TextEntered && foodSearchClicked)
             {
-                foodSearchInput +=event.text.unicode;
+                foodSearchResults.clear();
+                if(event.text.unicode==8){
+                    foodSearchInput.pop_back();
+                }
+                else{
+                    foodSearchInput +=event.text.unicode;
+                }
                 foodSearchText.setString(foodSearchInput);
+                for(int i = 0; foodSearchResults.size()<5 && i< vectorOfFoods.size();i++){
+                    if(vectorOfFoods[i].foodName.find(foodSearchInput)!=string::npos&&!foodSearchInput.empty()){
+                        foodSearchResults.push_back(vectorOfFoods[i].foodName);
+                    }
+                }
+                int temp = foodSearchResults.size();
+                foodSRRect.setSize(sf::Vector2f(340, temp*51));
+                if(foodSearchResults.size()<5){
+                    for(int j = 0 ; j < (5-temp) ; j++){
+                        foodSearchResults.push_back(" ");
+                    }
+                }
+                foodSROne.setString(foodSearchResults[0]);
+                foodSRTwo.setString(foodSearchResults[1]);
+                foodSRThree.setString(foodSearchResults[2]);
+                foodSRFour.setString(foodSearchResults[3]);
+                foodSRFive.setString(foodSearchResults[4]);
             }
 
             if (event.type == sf::Event::TextEntered && nutrientSearchClicked)
             {
-                nutrientSearchInput +=event.text.unicode;
+                nutrientSearchResults.clear();
+                if(event.text.unicode==8){
+                    nutrientSearchInput.pop_back();
+                }
+                else{
+                    nutrientSearchInput +=event.text.unicode;
+                }
                 nutrientSearchText.setString(nutrientSearchInput);
+                for(int i = 0; nutrientSearchResults.size()<5 && i< nutrients.size();i++){
+                    if(nutrients[i].find(nutrientSearchInput)!=string::npos&&nutrientSearchInput.size()>0){
+                        nutrientSearchResults.push_back(nutrients[i]);
+                    }
+                }
+                int temp = nutrientSearchResults.size();
+                nutrientSRRect.setSize(sf::Vector2f(340, temp*51));
+                if(nutrientSearchResults.size()<5){
+                    for(int j = 0 ; j < (5-temp) ; j++){
+                        nutrientSearchResults.push_back(" ");
+                    }
+                }
+                nutrientSROne.setString(nutrientSearchResults[0]);
+                nutrientSRTwo.setString(nutrientSearchResults[1]);
+                nutrientSRThree.setString(nutrientSearchResults[2]);
+                nutrientSRFour.setString(nutrientSearchResults[3]);
+                nutrientSRFive.setString(nutrientSearchResults[4]);
             }
 
             if (event.type == sf::Event::Closed)
@@ -259,7 +875,48 @@ int main() {
         }
 
         window.clear(sf::Color::White);
+
+        if(welcomeScreen){
+            window.draw(welcome);
+            window.draw(instructionsOne);
+            window.draw(instructionsTwo);
+            window.draw(instructionsThree);
+            window.draw(instructionsFour);
+            window.draw(instructionsFive);
+            window.draw(instructionsSix);
+            window.draw(instructionsSeven);
+        }
+        else{ // dr
+            window.draw(resultsLineOne);
+            window.draw(userFood);
+            window.draw(resultsLineTwo);
+            window.draw(userNutrient);
+
+            window.draw(numberOne);
+            window.draw(numberTwo);
+            window.draw(numberThree);
+            window.draw(numberFour);
+            window.draw(numberFive);
+            window.draw(numberSix);
+            window.draw(numberSeven);
+            window.draw(numberEight);
+            window.draw(numberNine);
+            window.draw(numberTen);
+
+            window.draw(foodCROne);
+            window.draw(foodCRTwo);
+            window.draw(foodCRThree);
+            window.draw(foodCRFour);
+            window.draw(foodCRFive);
+            window.draw(foodCRSix);
+            window.draw(foodCRSeven);
+            window.draw(foodCREight);
+            window.draw(foodCRNine);
+            window.draw(foodCRTen);
+        }
+
         window.draw(leftBar);
+        window.draw(menuText);
         window.draw(quickLeft);
         window.draw(quickRight);
         window.draw(quickMiddle);
@@ -268,8 +925,22 @@ int main() {
         window.draw(shellMiddle);
         window.draw(quickSortText);
         window.draw(shellSortText);
+        window.draw(foodSearchHeader);
         window.draw(foodSearch);
         window.draw(foodSearchText);
+        window.draw(foodSRRect);
+        window.draw(foodSROne);
+        window.draw(foodSRTwo);
+        window.draw(foodSRThree);
+        window.draw(foodSRFour);
+        window.draw(foodSRFive);
+        window.draw(nutrientSRRect);
+        window.draw(nutrientSROne);
+        window.draw(nutrientSRTwo);
+        window.draw(nutrientSRThree);
+        window.draw(nutrientSRFour);
+        window.draw(nutrientSRFive);
+        window.draw(nutrientSearchHeader);
         window.draw(nutrientSearch);
         window.draw(nutrientSearchText);
         window.display();
